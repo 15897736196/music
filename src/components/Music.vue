@@ -9,11 +9,12 @@
         <img @click="forwardMusic" src="../static/image/bg-forward.svg" alt="">
       </div>
     </div>
-
+    
     <audio ref="audio" class="audio_tag" @ended="handleMusicEnded">
       <source ref="source" type="audio/mpeg" preload="auto" />
     </audio>
-
+    
+    <MusicWave ref="wave" :paused="paused"></MusicWave>
     <div class="login" @click="loginByNetease">
       <span>login by</span>
       <img src="../static/image/netease.svg" alt="">
@@ -22,76 +23,87 @@
   </div>
 </template>
 
+<!-- <script src="https://unpkg.com/wavesurfer.js"></script> -->
 <script setup lang="ts">
 import { reactive, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import type { Ref } from "vue";
+import MusicWave from "@/components/MusicWave/wave.vue"
 import play from "../static/image/24gf-play.svg";
 import pause from "../static/image/24gf-pause2.svg";
 import rapOfChina from "../static/image/rapOfChina.jpg"
 import { getUserPlayList } from "@/api/music/playlist";
 // import forward from "../static/image/bg-forward.svg";
+
 const router = useRouter()
 const audio = ref();
 const source = ref();
 const disc = ref();
+const wave = ref()
 
 let paused: Ref<boolean> = ref(true);//播放、暂停
 let count = ref(0)
 const playList = reactive([
+
   {
-    musicUrl: 'https://chen41.com/Eurythmics-SweetDreams.mp3',
-    pictureUrl: 'https://chen41.com/Eurythmics-SweetDreams.jpg'
+    musicUrl: 'https://chen41.com/Stitches.mp3',
+    pictureUrl: 'https://chen41.com/Stitches.jpg'
   },
   {
-    musicUrl: 'https://chen41.com/ygrdbj.mp3',
-    pictureUrl: 'https://chen41.com/music.5.png'
-  },
-  {
-    musicUrl: '',
-    pictureUrl: rapOfChina
+    musicUrl: 'https://chen41.com/WayBackHome.mp3',
+    pictureUrl: 'https://chen41.com/wayBackHome.jpg'
   },
 ])
 onMounted(() => {
   source.value.src = playList[count.value].musicUrl
   disc.value.style.background = `url(${playList[count.value].pictureUrl})`
-  audio.value.load()
+  // audio.value.load()
+  wave.value.url = playList[count.value].musicUrl
 })
 function backMusic() {
   if (count.value > 0) {
     count.value--
-    source.value.src = playList[count.value].musicUrl
+    // source.value.src = playList[count.value].musicUrl
+    wave.value.url = playList[count.value].musicUrl
+    
     disc.value.style.background = `url(${playList[count.value].pictureUrl})`
-    audio.value.load()
-    !paused.value && audio.value.play();
+    // audio.value.load()
+    // !paused.value && audio.value.play();
+    // !paused.value && wave.value.dom.startStop()
   }
 }
-function forwardMusic() {
+async function forwardMusic() {
   if (count.value < playList.length - 1) {
     count.value++
-    source.value.src = playList[count.value].musicUrl
+    // source.value.src = playList[count.value].musicUrl
+    wave.value.url = playList[count.value].musicUrl
     disc.value.style.background = `url(${playList[count.value].pictureUrl})`
+    // await wave.value.dom.loadFile()
     // disc.value.style.backgroundSize = 'cover'
-    audio.value.load()
-    !paused.value && audio.value.play();
+    // audio.value.load()
+    // !paused.value && audio.value.play();
   }
 }
-function pauseMusic() {
-  if (audio && paused.value) {
-    audio.value.play();
-    paused.value = audio.value.paused;
-    disc.value.style.animationPlayState = 'running'
-  } else if (audio && !paused.value) {
-    audio.value.pause();
-    paused.value = audio.value.paused;
-    disc.value.style.animationPlayState = 'paused'
+async function pauseMusic() {
+  if (wave.value.dom) {
+    console.log(paused.value)
+    // audio.value.play();
+    // paused.value = audio.value.paused;
+    disc.value.style.animationPlayState =  paused.value ? 'running' : 'paused'
+    paused.value = !paused.value
   }
+  //  else if (audio && !paused.value) {
+  //   paused.value = audio.value.paused;
+  //   disc.value.style.animationPlayState = 'paused'
+
+  //   audio.value.pause();
+  //   wave.value.dom.startStop()
+  // }
 }
 
 function handleMusicEnded() {
   paused.value = true
   disc.value.style.animationPlayState = 'paused'
-
 }
 
 async function getPlayList() {
@@ -110,6 +122,10 @@ function loginByNetease() {
 </script>
 
 <style scoped lang="scss">
+#waveform{
+  // width: 50px;
+  // overflow: hidden;
+}
 .music_box {
   display: flex;
   flex-direction: column;
@@ -123,9 +139,11 @@ function loginByNetease() {
   min-width: 100px;
   height: 40vh;
   border-radius: 50px;
-  background: #a25757;
-  box-shadow: 30px 30px 53px #764040,
-    -30px -30px 53px #ce6e6e;
+  background: #292c38;
+  box-shadow: 20px 20px 27px #21232d,
+    -20px -20px 27px #313543;
+
+
 }
 
 @keyframes rotate {
@@ -167,18 +185,18 @@ function loginByNetease() {
   animation: rotate 20s linear infinite;
   animation-play-state: paused;
 
-  &::after {
-    display: block;
-    content: '';
-    border-radius: 50%;
-    position: absolute;
-    width: 2vh;
-    height: 2vh;
-    top: calc(50% - 1.5vh);
-    left: calc(50% - 1.5vh);
-    background: rgba(255, 255, 255, 0.922);
-    border: 5px solid #764040;
-  }
+  // &::after {
+  //   display: block;
+  //   content: '';
+  //   border-radius: 50%;
+  //   position: absolute;
+  //   width: 2vh;
+  //   height: 2vh;
+  //   top: calc(50% - 1.5vh);
+  //   left: calc(50% - 1.5vh);
+  //   background: rgba(255, 255, 255, 0.922);
+  //   border: 5px solid #2d303e;
+  // }
 }
 
 .playIcon {
@@ -215,7 +233,7 @@ function loginByNetease() {
 
 .login {
   // position: relative;
-  transform: translateY(4rem);
+  transform: translateY(3rem);
   line-height: 3rem;
   font-weight: bold;
   color: white;
@@ -223,20 +241,22 @@ function loginByNetease() {
   width: 9rem;
   height: 3rem;
   border-radius: 3rem;
-  border: 1px solid #c18d8d;
+  border: 1px solid #c7c7c7;
 
   display: flex;
   justify-content: center;
-  span{
+
+  span {
     margin-left: 1rem;
   }
+
   img {
     transform: scale(.6);
   }
 }
 
 .login:hover {
-  border: 2px solid #bc9b9b;
+  border: 1.5px solid #ffffff;
 }
 
 // @media (max-width: 1024px) {

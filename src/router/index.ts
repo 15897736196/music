@@ -7,7 +7,7 @@ const router = createRouter({
       path: '/',
       component: () => import('../layout/layout.vue'),
       children: [
-        { path: 'music', component: () => import('../components/Music.vue') },
+        { path: 'music', name: 'Music', component: () => import('@/components/Music.vue'), meta: { keepAlive: true } },
         {
           path: 'login', component: () => import('../views/login/index.vue'),
           children: [
@@ -15,7 +15,7 @@ const router = createRouter({
             { path: 'shortMsg', component: () => import('../views/login/loginByShortMsg.vue') },
           ]
         },
-
+        { path: 'wave', component: () => import('@/components/MusicWave/wave.vue'), meta: { keepAlive: true } }
       ]
     }
   ]

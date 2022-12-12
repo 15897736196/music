@@ -8,7 +8,11 @@
         <div class="box">there is nothing ...</div>
         <!-- <Music></Music> -->
         <nav>
-            <router-view></router-view>
+            <router-view v-slot="{ Component }">
+                <keep-alive include="Music">
+                    <component :is="Component" />
+                </keep-alive>
+            </router-view>
             <!-- <RouterLink to="/about">About</RouterLink> -->
         </nav>
     </div>
@@ -16,16 +20,16 @@
 
 <script setup lang="ts">
 import { RouterLink, RouterView } from "vue-router";
-import HelloWorld from "../components/HelloWorld.vue";
-import Music from '../components/Music.vue';
+import HelloWorld from "@/components/HelloWorld.vue";
+// import Music from '../components/Music.vue';
 import { useRouter } from "vue-router";
 const router = useRouter()
 
-function goHome(){
+function goHome() {
     router.replace('/music')
 }
 
-function goBack(){
+function goBack() {
     router.back()
 }
 </script>
